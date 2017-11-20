@@ -40,9 +40,9 @@ defmodule PhoenixClientSsl.Plug.ExtractCommonName do
 
   Skipping if either the common name is already set or the connection has no client certificate.
   """
-  def call(%Conn{assigns: %{client_certificate_common_name: _}} = conn, _options), do: conn
-  def call(%Conn{assigns: %{client_certificate: certificate}} = conn, _options) do
-    assign(conn, :client_certificate_common_name, PublicKeySubject.common_name(certificate))
+  def call(%Conn{private: %{client_certificate_common_name: _}} = conn, _options), do: conn
+  def call(%Conn{private: %{client_certificate: certificate}} = conn, _options) do
+    put_private(conn, :client_certificate_common_name, PublicKeySubject.common_name(certificate))
   end
   def call(conn, _options), do: conn
 end

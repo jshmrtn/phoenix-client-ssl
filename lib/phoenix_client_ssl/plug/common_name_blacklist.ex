@@ -56,10 +56,10 @@ defmodule PhoenixClientSsl.Plug.CommonNameBlacklist do
   @doc """
   Check if the common name matches against a given blacklist of patterns.
   """
-  def call(%Conn{assigns: %{client_certificate_common_name: _}} = conn, %{patterns: []}) do
+  def call(%Conn{private: %{client_certificate_common_name: _}} = conn, %{patterns: []}) do
     conn
   end
-  def call(%Conn{assigns: %{client_certificate_common_name: name}} = conn, %{patterns: patterns, handler: handler}) do
+  def call(%Conn{private: %{client_certificate_common_name: name}} = conn, %{patterns: patterns, handler: handler}) do
     if GlobMatcher.matches?(patterns, name) do
       apply(handler, [conn, :forbidden])
     else

@@ -25,9 +25,9 @@ defmodule PhoenixClientSsl.Plug.ExtractClientCertificateTest do
     test "skipps with already configure certificate" do
       socket = SslsocketMock.test_socket()
       request = :cowboy_req.new(socket, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, false, 13, 14)
-      conn = %Conn{adapter: {Plug.Adapters.Cowboy.Conn, request}, assigns: %{client_certificate: :foo}}
+      conn = %Conn{adapter: {Plug.Adapters.Cowboy.Conn, request}, private: %{client_certificate: :foo}}
 
-      assert %Conn{assigns: %{client_certificate: :foo}} = ExtractClientCertificate.call(conn, %{})
+      assert %Conn{private: %{client_certificate: :foo}} = ExtractClientCertificate.call(conn, %{})
     end
 
     test "extracts certificate" do
@@ -35,7 +35,7 @@ defmodule PhoenixClientSsl.Plug.ExtractClientCertificateTest do
       request = :cowboy_req.new(socket, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, false, 13, 14)
       conn = %Conn{adapter: {Plug.Adapters.Cowboy.Conn, request}}
 
-      assert %Conn{assigns: %{client_certificate: certificate}} = ExtractClientCertificate.call(conn, %{})
+      assert %Conn{private: %{client_certificate: certificate}} = ExtractClientCertificate.call(conn, %{})
       assert {:"OTPCertificate", _, _, _} = certificate
     end
 
@@ -44,15 +44,15 @@ defmodule PhoenixClientSsl.Plug.ExtractClientCertificateTest do
       request = :cowboy_req.new(socket, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, false, 13, 14)
       conn = %Conn{adapter: {Plug.Adapters.Cowboy.Conn, request}}
 
-      assert %Conn{assigns: assigns} = ExtractClientCertificate.call(conn, %{})
-      refute assigns[:client_certificate]
+      assert %Conn{private: private} = ExtractClientCertificate.call(conn, %{})
+      refute private[:client_certificate]
     end
 
     test "skips with wrong adapter" do
       conn = %Conn{adapter: {Some.Other.Adapter, :something}}
 
-      assert %Conn{assigns: assigns} = ExtractClientCertificate.call(conn, %{})
-      refute assigns[:client_certificate]
+      assert %Conn{private: private} = ExtractClientCertificate.call(conn, %{})
+      refute private[:client_certificate]
     end
   end
 end

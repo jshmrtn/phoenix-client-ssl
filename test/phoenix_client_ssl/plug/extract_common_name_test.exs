@@ -27,22 +27,22 @@ defmodule PhoenixClientSsl.Plug.ExtractCommonNameTest do
 
   describe "call/2" do
     test "skipps with already configure common name" do
-      conn = %Conn{assigns: %{client_certificate: @otp_cert, client_certificate_common_name: :foo}}
+      conn = %Conn{private: %{client_certificate: @otp_cert, client_certificate_common_name: :foo}}
 
-      assert %Conn{assigns: %{client_certificate_common_name: :foo}} = ExtractCommonName.call(conn, %{})
+      assert %Conn{private: %{client_certificate_common_name: :foo}} = ExtractCommonName.call(conn, %{})
     end
 
     test "extracts common name" do
-      conn = %Conn{assigns: %{client_certificate: @otp_cert}}
+      conn = %Conn{private: %{client_certificate: @otp_cert}}
 
-      assert %Conn{assigns: %{client_certificate_common_name: "foo.bar.baz"}} = ExtractCommonName.call(conn, %{})
+      assert %Conn{private: %{client_certificate_common_name: "foo.bar.baz"}} = ExtractCommonName.call(conn, %{})
     end
 
     test "skips with missing certificate" do
       conn = %Conn{}
 
-      assert %Conn{assigns: assigns} = ExtractCommonName.call(conn, %{})
-      refute assigns[:client_certificate_common_name]
+      assert %Conn{private: private} = ExtractCommonName.call(conn, %{})
+      refute private[:client_certificate_common_name]
     end
   end
 end

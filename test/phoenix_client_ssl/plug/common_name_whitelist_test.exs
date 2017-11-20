@@ -22,7 +22,7 @@ defmodule PhoenixClientSsl.Plug.CommonNameWhitelistTest do
 
   describe "call/2" do
     test "passes with valid pattern whitelist" do
-      conn = %Conn{assigns: %{client_certificate_common_name: "foo"}}
+      conn = %Conn{private: %{client_certificate_common_name: "foo"}}
       options = %{patterns: ["foo"], handler: &send_and_return/2}
 
       assert %Conn{} = CommonNameWhitelist.call(conn, options)
@@ -32,7 +32,7 @@ defmodule PhoenixClientSsl.Plug.CommonNameWhitelistTest do
     end
 
     test "stops with invalid pattern whitelist" do
-      conn = %Conn{assigns: %{client_certificate_common_name: "foo"}}
+      conn = %Conn{private: %{client_certificate_common_name: "foo"}}
       options = %{patterns: ["bar"], handler: &send_and_return/2}
 
       assert %Conn{} = CommonNameWhitelist.call(conn, options)
@@ -42,7 +42,7 @@ defmodule PhoenixClientSsl.Plug.CommonNameWhitelistTest do
     end
 
     test "stops with empty pattern whitelist" do
-      conn = %Conn{assigns: %{client_certificate_common_name: "foo"}}
+      conn = %Conn{private: %{client_certificate_common_name: "foo"}}
       options = %{patterns: [], handler: &send_and_return/2}
 
       assert %Conn{} = CommonNameWhitelist.call(conn, options)
