@@ -1,15 +1,16 @@
 # Phoenix Client SSL
 
-[![pipeline status](https://gitlab.airatel.com/joshmartin/phoenix-client-ssl/badges/master/pipeline.svg)](https://gitlab.airatel.com/joshmartin/phoenix-client-ssl/commits/master)
-[![coverage report](https://gitlab.airatel.com/joshmartin/phoenix-client-ssl/badges/master/coverage.svg)](https://gitlab.airatel.com/joshmartin/phoenix-client-ssl/commits/master)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jshmrtn/phoenix-client-ssl/master/LICENSE)
+[![Build Status](https://travis-ci.org/jshmrtn/phoenix-client-ssl.svg?branch=master)](https://travis-ci.org/jshmrtn/phoenix-client-ssl)
+[![Hex.pm Version](https://img.shields.io/hexpm/v/phoenix_client_ssl.svg?style=flat)](https://hex.pm/packages/phoenix_client_ssl)
+[![InchCI](https://inch-ci.org/github/jshmrtn/phoenix-client-ssl.svg?branch=master)](https://inch-ci.org/github/jshmrtn/phoenix-client-ssl)
 
 
 Set of Plugs / Lib to help with SSL Client Auth.
 
-<!--## Installation
+## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `phoenix_client_ssl` to your list of dependencies in `mix.exs`:
+The package can be installed by adding `phoenix_client_ssl` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -17,6 +18,4 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/phoenix_client_ssl](https://hexdocs.pm/phoenix_client_ssl).-->
+The docs can be found at [https://hexdocs.pm/phoenix_client_ssl](https://hexdocs.pm/phoenix_client_ssl).
