@@ -16,7 +16,7 @@ defmodule PhoenixClientSsl.Plug.CommonNameWhitelistTest do
   describe "init/1" do
     test "config with patterns passes" do
       options = [patterns: ["foo"], handler: &send_and_return/2]
-      assert %{patterns: ["foo"], handler: _} = CommonNameWhitelist.init(options)
+      assert %{patterns: [_], handler: _} = CommonNameWhitelist.init(options)
     end
   end
 

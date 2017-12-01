@@ -47,8 +47,15 @@ defmodule PhoenixClientSsl.Plug.CommonNameBlacklist do
 
   """
   def init(options) when is_list(options) do
+    patterns = options
+    |> Keyword.get(:patterns, [])
+    |> Enum.map(fn pattern ->
+      {:ok, pattern} = :glob.compile(pattern)
+      pattern
+    end)
+
     %{
-      patterns: Keyword.get(options, :patterns, []),
+      patterns: patterns,
       handler: Keyword.fetch!(options, :handler),
     }
   end
@@ -60,7 +67,7 @@ defmodule PhoenixClientSsl.Plug.CommonNameBlacklist do
     conn
   end
   def call(%Conn{private: %{client_certificate_common_name: name}} = conn, %{patterns: patterns, handler: handler}) do
-    if GlobMatcher.matches?(patterns, name) do
+    if Enum.any?(patterns, fn pattern -> :glob.matches(name, pattern) end) do
       apply(handler, [conn, :forbidden])
     else
       conn

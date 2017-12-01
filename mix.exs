@@ -27,6 +27,7 @@ defmodule PhoenixClientSsl.Mixfile do
   defp deps do
     [{:phoenix, "~> 1.3.0-rc"},
      {:cowboy, "~> 1.0"},
+     {:glob, "~> 0.0.9"},
      {:ex_doc, ">= 0.0.0", only: [:dev, :test], runtime: false},
      {:excoveralls, "~> 0.4", only: [:dev, :test], runtime: false},
      {:credo, "~> 0.5", only: [:dev, :test], runtime: false},
