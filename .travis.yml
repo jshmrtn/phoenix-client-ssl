@@ -5,10 +5,21 @@ elixir:
   - 1.6
 otp_release:
   - 20.0
-after_script:
-  - MIX_ENV=docs mix deps.get
-  - MIX_ENV=docs mix inch.report
 notifications:
   email:
     on_success: change
     on_failure: change
+cache:
+  directories:
+    - ~/.mix
+    - ~/.hex
+jobs:
+  include:
+    - stage: format
+      script: mix format --check-formatted
+      elixir: 1.6
+    - stage: inch-ci
+      env:
+        - MIX_ENV=docs
+      script: mix inch.report
+      elixir: 1.6
