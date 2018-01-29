@@ -3,6 +3,8 @@ defmodule PhoenixClientSsl.Plug.AddClientCertificateToAbsintheContextTest do
 
   use ExUnit.Case
 
+  alias PhoenixClientSsl.Plug.ExtractClientCertificate
+  alias PhoenixClientSsl.Plug.ExtractCommonName
   alias PhoenixClientSsl.Plug.AddClientCertificateToAbsintheContext
   alias Plug.Conn
   alias PhoenixClientSsl.Support.SslsocketMock
@@ -22,42 +24,42 @@ defmodule PhoenixClientSsl.Plug.AddClientCertificateToAbsintheContextTest do
   end
 
   describe "call/2" do
-    test "skipps with already configure certificate" do
-      socket = SslsocketMock.test_socket()
-      request = :cowboy_req.new(socket, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, false, 13, 14)
-      conn = %Conn{adapter: {Plug.Adapters.Cowboy.Conn, request}, private: %{client_certificate: :foo}}
-
-      assert %Conn{private: %{client_certificate: :foo}} = AddClientCertificateToAbsintheContext.call(conn, %{})
+    test "skipps with no common name added" do
+      conn = %Conn{}
+      assert conn = AddClientCertificateToAbsintheContext.call(conn, %{})
     end
 
-    test "extracts certificate and add it to existing absinthe map" do
+    test "skipps with already configured certificate" do
+      conn = %Conn{private: %{absinthe: %{context: %{client_certificate_common_name: :foo}}}}
+
+      assert conn = AddClientCertificateToAbsintheContext.call(conn, %{})
+    end
+
+    test "extracts certificate and adds it to existing absinthe map" do
       socket = SslsocketMock.test_socket()
       request = :cowboy_req.new(socket, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, false, 13, 14)
       conn = %Conn{
-        adapter: {Plug.Adapters.Cowboy.Conn, request}}
+        adapter: {Plug.Adapters.Cowboy.Conn, request},
+        private: %{absinthe: %{random_value: "value"}}}
+        |> ExtractClientCertificate.call(%{})
+        |> ExtractCommonName.call(%{})
 
-      assert %Conn{private: %{absinthe: %{context: %{client_certificate: certificate}}}}
+      assert %Conn{private: %{absinthe: %{context: %{client_certificate_common_name: common_name}, random_value: "value"}}}
         = AddClientCertificateToAbsintheContext.call(conn, %{})
-      assert {:"OTPCertificate", _, _, _} = certificate
+
+      assert "foo.bar.baz" = common_name
     end
 
     test "extracts certificate" do
       socket = SslsocketMock.test_socket()
       request = :cowboy_req.new(socket, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, false, 13, 14)
       conn = %Conn{adapter: {Plug.Adapters.Cowboy.Conn, request}}
+      |> ExtractClientCertificate.call(%{})
+      |> ExtractCommonName.call(%{})
 
-      assert %Conn{private: %{absinthe: %{context: %{client_certificate: certificate}}}}
+      assert %Conn{private: %{absinthe: %{context: %{client_certificate_common_name: common_name}}}}
         = AddClientCertificateToAbsintheContext.call(conn, %{})
-      assert {:"OTPCertificate", _, _, _} = certificate
-    end
-
-    test "does nothing with incorrect socket" do
-      socket = SslsocketMock.undefined_test_socket()
-      request = :cowboy_req.new(socket, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, false, 13, 14)
-      conn = %Conn{adapter: {Plug.Adapters.Cowboy.Conn, request}}
-
-      assert %Conn{private: private} = AddClientCertificateToAbsintheContext.call(conn, %{})
-      refute private[:client_certificate]
+      assert "foo.bar.baz" = common_name
     end
   end
 end
