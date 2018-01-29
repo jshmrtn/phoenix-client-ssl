@@ -39,18 +39,23 @@ if Code.ensure_loaded?(Absinthe.Plug) do
     @doc """
     Add common name of a certificate to Absinthe context.
     """
-    def call(%Conn{
-      private: %{absinthe: absinthe, client_certificate_common_name: common_name}} = conn, _options) do
-        absinthe =
+    def call(
+          %Conn{private: %{absinthe: absinthe, client_certificate_common_name: common_name}} =
+            conn,
+          _options
+        ) do
+      absinthe =
         absinthe
         |> Map.put_new(:context, %{})
         |> put_in([:context, :client_certificate_common_name], common_name)
 
-        put_private(conn, :absinthe, absinthe)
+      put_private(conn, :absinthe, absinthe)
     end
+
     def call(%Conn{private: %{client_certificate_common_name: _}} = conn, options) do
       call(put_private(conn, :absinthe, %{}), options)
     end
+
     def call(%Conn{} = conn, _options), do: conn
   end
 end
