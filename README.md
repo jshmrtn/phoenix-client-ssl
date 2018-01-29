@@ -14,7 +14,7 @@ The package can be installed by adding `phoenix_client_ssl` to your list of depe
 
 ```elixir
 def deps do
-  [{:phoenix_client_ssl, "~> 0.1.0"}]
+  [{:phoenix_client_ssl, "~> 0.1.1"}]
 end
 ```
 
