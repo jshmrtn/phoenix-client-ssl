@@ -9,7 +9,7 @@ defmodule PhoenixClientSsl.Plug.CommonNameBlacklistTest do
   doctest CommonNameBlacklist
 
   defp send_and_return(conn, reason) do
-    send self(), reason
+    send(self(), reason)
     conn
   end
 

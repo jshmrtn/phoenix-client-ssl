@@ -40,15 +40,17 @@ defmodule PhoenixClientSsl.Plug.ExtractClientCertificate do
   or if the connection adapter is not `Plug.Adapters.Cowboy.Conn`.
   """
   def call(%Conn{private: %{client_certificate: _}} = conn, _options), do: conn
+
   def call(%Conn{adapter: {Plug.Adapters.Cowboy.Conn, request}} = conn, _options) do
     with {:sslsocket, _, _} = socket <- :cowboy_req.get(:socket, request),
          {:ok, raw_certificate} <- :ssl.peercert(socket),
-         {:"OTPCertificate", _, _, _} = certificate <- :public_key.pkix_decode_cert(raw_certificate, :otp)
-    do
+         {:OTPCertificate, _, _, _} = certificate <-
+           :public_key.pkix_decode_cert(raw_certificate, :otp) do
       put_private(conn, :client_certificate, certificate)
     else
       _ -> conn
     end
   end
+
   def call(conn, _options), do: conn
 end
