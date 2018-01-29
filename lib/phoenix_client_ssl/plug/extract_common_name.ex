@@ -36,7 +36,7 @@ defmodule PhoenixClientSsl.Plug.ExtractCommonName do
   def init([]), do: %{}
 
   @doc """
-  Extract the COmmon Name of a certificate in eligible connections.
+  Extract the Common Name of a certificate in eligible connections.
 
   Skipping if either the common name is already set or the connection has no client certificate.
   """

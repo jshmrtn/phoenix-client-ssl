@@ -49,6 +49,7 @@ defmodule PhoenixClientSsl.Mixfile do
       {:phoenix, "~> 1.3.0"},
       {:cowboy, "~> 1.0"},
       {:glob, "~> 0.0.9"},
+      {:absinthe_plug, "~> 1.4", optional: true},
       {:inch_ex, only: :docs, runtime: false},
       {:ex_doc, ">= 0.0.0", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.4", only: [:dev, :test], runtime: false},
