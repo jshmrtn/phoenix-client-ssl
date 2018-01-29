@@ -8,12 +8,12 @@ defmodule PhoenixClientSsl.Mixfile do
       app: :phoenix_client_ssl,
       version: "0.1.0",
       elixir: "~> 1.4",
-      elixirc_paths: elixirc_paths(Mix.env),
+      elixirc_paths: elixirc_paths(Mix.env()),
       description: description(),
       package: package(),
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
-      compilers: Mix.compilers ++ [:erlang, :app],
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      compilers: Mix.compilers() ++ [:erlang, :app],
       test_coverage: [tool: ExCoveralls],
       erlc_paths: ["lib"],
       deps: deps()
@@ -22,7 +22,7 @@ defmodule PhoenixClientSsl.Mixfile do
 
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_),     do: ["lib"]
+  defp elixirc_paths(_), do: ["lib"]
 
   def application do
     [extra_applications: [:logger, :public_key]]

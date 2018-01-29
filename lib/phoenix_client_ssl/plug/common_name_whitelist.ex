@@ -47,32 +47,41 @@ defmodule PhoenixClientSsl.Plug.CommonNameWhitelist do
 
   """
   def init(options) when is_list(options) do
-    patterns = options
-    |> Keyword.get(:patterns, [])
-    |> Enum.map(fn pattern ->
-      {:ok, pattern} = :glob.compile(pattern)
-      pattern
-    end)
+    patterns =
+      options
+      |> Keyword.get(:patterns, [])
+      |> Enum.map(fn pattern ->
+        {:ok, pattern} = :glob.compile(pattern)
+        pattern
+      end)
 
     %{
       patterns: patterns,
-      handler: Keyword.fetch!(options, :handler),
+      handler: Keyword.fetch!(options, :handler)
     }
   end
 
   @doc """
   Check if the common name matches against a given whitelist of patterns.
   """
-  def call(%Conn{private: %{client_certificate_common_name: _}} = conn, %{patterns: [], handler: handler}) do
+  def call(%Conn{private: %{client_certificate_common_name: _}} = conn, %{
+        patterns: [],
+        handler: handler
+      }) do
     apply(handler, [conn, :forbidden])
   end
-  def call(%Conn{private: %{client_certificate_common_name: name}} = conn, %{patterns: patterns, handler: handler}) do
+
+  def call(%Conn{private: %{client_certificate_common_name: name}} = conn, %{
+        patterns: patterns,
+        handler: handler
+      }) do
     if Enum.any?(patterns, fn pattern -> :glob.matches(name, pattern) end) do
       conn
     else
       apply(handler, [conn, :forbidden])
     end
   end
+
   def call(conn, %{handler: handler}) do
     apply(handler, [conn, :unauthorized])
   end
