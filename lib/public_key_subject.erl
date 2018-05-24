@@ -13,6 +13,7 @@
 -include_lib("public_key/include/public_key.hrl").
 
 -export ([common_name/1,
+          email_address/1,
           pkix_subject_id/1]).
 
 %%--------------------------------------------------------------------
@@ -44,6 +45,23 @@ common_name({rdnSequence, Sequence}) ->
   end;
 common_name(Cert) ->
   common_name(pkix_subject_id(Cert)).
+
+%%--------------------------------------------------------------------
+-spec email_address(Cert::{rdnSequence, [#'AttributeTypeAndValue'{}]} | binary() | #'OTPCertificate'{}) -> binary().
+
+%
+%% Description: Returns the email address.
+%%--------------------------------------------------------------------
+
+email_address({rdnSequence, Sequence}) ->
+  case rdn_part(Sequence, ?'id-emailAddress') of
+    error ->
+      error;
+    Other ->
+      Other
+  end;
+email_address(Cert) ->
+  email_address(pkix_subject_id(Cert)).
 
 %%--------------------------------------------------------------------
 -spec rdn_part([#'AttributeTypeAndValue'{}], any()) -> any().
