@@ -43,7 +43,11 @@ defmodule PhoenixClientSsl.Plug.ExtractEmailAddress do
   def call(%Conn{private: %{client_certificate_email_address: _}} = conn, _options), do: conn
 
   def call(%Conn{private: %{client_certificate: certificate}} = conn, _options) do
-    put_private(conn, :client_certificate_email_address, PublicKeySubject.email_address(certificate))
+    put_private(
+      conn,
+      :client_certificate_email_address,
+      PublicKeySubject.email_address(certificate)
+    )
   end
 
   def call(conn, _options), do: conn

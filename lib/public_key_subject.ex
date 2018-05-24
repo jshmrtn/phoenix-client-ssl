@@ -38,8 +38,8 @@ defmodule PublicKeySubject do
   """
   def email_address(cert_or_rdn_sequence) do
     case :public_key_subject.email_address(cert_or_rdn_sequence) do
-        email_address when is_list(email_address) -> to_string(email_address)
-        email_address -> email_address
+      email_address when is_list(email_address) -> to_string(email_address)
+      email_address -> email_address
     end
   end
 
