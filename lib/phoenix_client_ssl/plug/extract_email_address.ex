@@ -1,6 +1,6 @@
 defmodule PhoenixClientSsl.Plug.ExtractEmailAddress do
   @moduledoc """
-  This Plug extracts the Common Name of a certificate in eligible connections.
+  This Plug extracts the `emailAddress` of a certificate in eligible connections.
 
   Best used together with `PhoenixClientSsl.Plug.ExtractClientCertificate`.
 
@@ -36,9 +36,9 @@ defmodule PhoenixClientSsl.Plug.ExtractEmailAddress do
   def init([]), do: %{}
 
   @doc """
-  Extract the Common Name of a certificate in eligible connections.
+  Extract the emailAddress of a certificate in eligible connections.
 
-  Skipping if either the common name is already set or the connection has no client certificate.
+  Skipping if either the email address is already set or the connection has no client certificate.
   """
   def call(%Conn{private: %{client_certificate_email_address: _}} = conn, _options), do: conn
 
