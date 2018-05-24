@@ -22,3 +22,6 @@ erl_crash.dump
 
 # Ignore Lock file since it is a lib
 /mix.lock
+
+# Ignore language server dir
+/.elixir_ls

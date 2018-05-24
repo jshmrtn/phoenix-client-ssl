@@ -56,6 +56,29 @@ defmodule PublicKeySubjectTest do
     end
   end
 
+  describe "email_address/1" do
+    for {expected, data} <- @test_sequences do
+      @data data
+      test "correct output for #{expected}" do
+        assert PublicKeySubject.email_address(@data) === "jonatan@maennchen.ch"
+      end
+    end
+
+    test "sequence without email address" do
+      assert PublicKeySubject.email_address({:rdnSequence, []}) == :error
+    end
+
+    test "with cert string" do
+      assert PublicKeySubject.email_address(@der_cert) == "jonatan@maennchen.ch"
+    end
+
+    test "with otp cert" do
+      cert = :public_key.pkix_decode_cert(@der_cert, :otp)
+
+      assert PublicKeySubject.email_address(cert) == "jonatan@maennchen.ch"
+    end
+  end
+
   describe "pkix_subject_id/1" do
     test "with cert string" do
       assert PublicKeySubject.pkix_subject_id(@der_cert) ==
