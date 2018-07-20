@@ -3,19 +3,24 @@ defmodule PhoenixClientSsl.VerifyIssuer do
   Check separate Issuer
   """
 
-  def verify(certificate, :valid_peer, [ca_path]) do
-    ca_path
-    |> File.read!()
-    |> :public_key.pem_decode()
-    |> Enum.map(fn {_, bin, _} -> bin end)
-    |> List.first()
-    |> :public_key.pkix_path_validation([certificate], [])
-    |> case do
-      {:ok, _} ->
-        {:valid_peer, []}
-
-      _ ->
-        {:fail, :invalid_issuer}
+  def verify(certificate, :valid_peer, ca_paths) do
+    ca_paths
+    |> Enum.map(&File.read!/1)
+    |> Enum.flat_map(fn contents ->
+      contents
+      |> :public_key.pem_decode()
+      |> Enum.map(fn {_, bin, _} -> bin end)
+    end)
+    |> Enum.any?(fn trusted ->
+      case :public_key.pkix_path_validation(trusted, [certificate], []) do
+        {:ok, _} -> true
+        _ -> false
+      end
+    end)
+    |> if do
+      {:valid_peer, []}
+    else
+      {:fail, :invalid_issuer}
     end
   end
 
