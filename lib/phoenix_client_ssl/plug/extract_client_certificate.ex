@@ -52,5 +52,18 @@ defmodule PhoenixClientSsl.Plug.ExtractClientCertificate do
     end
   end
 
+  def call(
+        %Conn{adapter: {Plug.Adapters.Cowboy2.Conn, %{cert: raw_certificate}}} = conn,
+        _options
+      ) do
+    case :public_key.pkix_decode_cert(raw_certificate, :otp) do
+      {:OTPCertificate, _, _, _} = certificate ->
+        put_private(conn, :client_certificate, certificate)
+
+      _ ->
+        conn
+    end
+  end
+
   def call(conn, _options), do: conn
 end
