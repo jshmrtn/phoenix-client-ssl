@@ -37,16 +37,18 @@ defmodule PhoenixClientSsl.Plug.ExtractClientCertificate do
   Extract TLS Client Certificate from Connection.
 
   Skipping if either the certificate is already set, the socket is non-ssl,
-  or if the connection adapter is not `Plug.Adapters.Cowboy.Conn`.
+  or if the connection adapter is not `Plug.Adapters.Cowboy.Conn` or `Plug.Cowboy.Conn`
   """
   def call(%Conn{private: %{client_certificate: _}} = conn, _options), do: conn
 
+  def call(%Conn{adapter: {Plug.Cowboy.Conn, request}} = conn, _options) do
+    do_call(conn, :cowboy_req.cert(request))
+  end
+
   def call(%Conn{adapter: {Plug.Adapters.Cowboy.Conn, request}} = conn, _options) do
     with {:sslsocket, _, _} = socket <- :cowboy_req.get(:socket, request),
-         {:ok, raw_certificate} <- :ssl.peercert(socket),
-         {:OTPCertificate, _, _, _} = certificate <-
-           :public_key.pkix_decode_cert(raw_certificate, :otp) do
-      put_private(conn, :client_certificate, certificate)
+         {:ok, raw_certificate} <- :ssl.peercert(socket) do
+      do_call(conn, raw_certificate)
     else
       _ -> conn
     end
@@ -57,6 +59,12 @@ defmodule PhoenixClientSsl.Plug.ExtractClientCertificate do
         _options
       )
       when is_binary(raw_certificate) do
+    do_call(conn, raw_certificate)
+  end
+
+  def call(conn, _options), do: conn
+
+  defp do_call(conn, raw_certificate) when is_binary(raw_certificate) do
     case :public_key.pkix_decode_cert(raw_certificate, :otp) do
       {:OTPCertificate, _, _, _} = certificate ->
         put_private(conn, :client_certificate, certificate)
@@ -66,5 +74,5 @@ defmodule PhoenixClientSsl.Plug.ExtractClientCertificate do
     end
   end
 
-  def call(conn, _options), do: conn
+  defp do_call(conn, _), do: conn
 end
