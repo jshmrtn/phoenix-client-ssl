@@ -4,8 +4,17 @@ defmodule PhoenixClientSsl.Plug.ExtractClientCertificateTest do
   use ExUnit.Case
 
   alias PhoenixClientSsl.Plug.ExtractClientCertificate
-  alias Plug.Conn
   alias PhoenixClientSsl.Support.SslsocketMock
+  alias Plug.Conn
+
+  @der_cert File.read!(
+              Path.join([
+                Application.app_dir(:phoenix_client_ssl),
+                "priv",
+                "test",
+                "foo.bar.baz.der"
+              ])
+            )
 
   doctest ExtractClientCertificate
 
@@ -22,7 +31,8 @@ defmodule PhoenixClientSsl.Plug.ExtractClientCertificateTest do
   end
 
   describe "call/2" do
-    test "skipps with already configure certificate" do
+    @tag :cowboy_1
+    test "cowboy1 skipps with already configure certificate" do
       socket = SslsocketMock.test_socket()
       request = :cowboy_req.new(socket, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, false, 13, 14)
 
@@ -35,7 +45,8 @@ defmodule PhoenixClientSsl.Plug.ExtractClientCertificateTest do
                ExtractClientCertificate.call(conn, %{})
     end
 
-    test "extracts certificate" do
+    @tag :cowboy_1
+    test "cowboy1 extracts certificate" do
       socket = SslsocketMock.test_socket()
       request = :cowboy_req.new(socket, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, false, 13, 14)
       conn = %Conn{adapter: {Plug.Adapters.Cowboy.Conn, request}}
@@ -46,13 +57,35 @@ defmodule PhoenixClientSsl.Plug.ExtractClientCertificateTest do
       assert {:OTPCertificate, _, _, _} = certificate
     end
 
-    test "does nothing with incorrect socket" do
+    @tag :cowboy_1
+    test "cowboy1 does nothing with incorrect socket" do
       socket = SslsocketMock.undefined_test_socket()
       request = :cowboy_req.new(socket, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, false, 13, 14)
       conn = %Conn{adapter: {Plug.Adapters.Cowboy.Conn, request}}
 
       assert %Conn{private: private} = ExtractClientCertificate.call(conn, %{})
       refute private[:client_certificate]
+    end
+
+    @tag :cowboy_2
+    test "cowboy2 skipps with already configure certificate" do
+      conn = %Conn{
+        adapter: {Plug.Adapters.Cowboy2.Conn, %{cert: @der_cert}},
+        private: %{client_certificate: :foo}
+      }
+
+      assert %Conn{private: %{client_certificate: :foo}} =
+               ExtractClientCertificate.call(conn, %{})
+    end
+
+    @tag :cowboy_2
+    test "cowboy2 extracts certificate" do
+      conn = %Conn{adapter: {Plug.Adapters.Cowboy2.Conn, %{cert: @der_cert}}}
+
+      assert %Conn{private: %{client_certificate: certificate}} =
+               ExtractClientCertificate.call(conn, %{})
+
+      assert {:OTPCertificate, _, _, _} = certificate
     end
 
     test "skips with wrong adapter" do

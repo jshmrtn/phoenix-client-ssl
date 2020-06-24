@@ -7,7 +7,7 @@ defmodule PhoenixClientSsl.Mixfile do
     [
       app: :phoenix_client_ssl,
       version: "0.4.1",
-      elixir: "~> 1.4",
+      elixir: "~> 1.8",
       elixirc_paths: elixirc_paths(Mix.env()),
       description: description(),
       package: package(),
@@ -16,7 +16,19 @@ defmodule PhoenixClientSsl.Mixfile do
       compilers: Mix.compilers() ++ [:erlang, :app],
       test_coverage: [tool: ExCoveralls],
       erlc_paths: ["lib"],
-      deps: deps()
+      deps: deps(),
+      build_embedded: (System.get_env("BUILD_EMBEDDED") || "false") in ["1", "true"],
+      dialyzer:
+        [
+          ignore_warnings: ".dialyzer_ignore.exs"
+        ] ++
+          if (System.get_env("DIALYZER_PLT_PRIV") || "false") in ["1", "true"] do
+            [
+              plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+            ]
+          else
+            []
+          end
     ]
   end
 
@@ -48,13 +60,12 @@ defmodule PhoenixClientSsl.Mixfile do
     [
       {:phoenix, "~> 1.3"},
       {:cowboy, "~> 1.0 or ~> 2.0"},
-      {:glob, "~> 0.0.9"},
+      {:glob, "~> 1.0"},
       {:absinthe_plug, "~> 1.4", optional: true},
-      {:inch_ex, only: :docs, runtime: false},
-      {:ex_doc, ">= 0.0.0", only: [:dev, :test], runtime: false},
-      {:excoveralls, "~> 0.4", only: [:dev, :test], runtime: false},
-      {:credo, "~> 0.5", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 0.4", only: [:dev, :test], runtime: false}
+      {:ex_doc, "~> 0.19", only: [:dev], runtime: false},
+      {:excoveralls, "~> 0.4", only: [:test], runtime: false},
+      {:credo, "~> 1.4", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
     ]
   end
 end

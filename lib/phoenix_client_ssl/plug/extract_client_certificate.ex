@@ -45,12 +45,14 @@ defmodule PhoenixClientSsl.Plug.ExtractClientCertificate do
     do_call(conn, :cowboy_req.cert(request))
   end
 
-  def call(%Conn{adapter: {Plug.Adapters.Cowboy.Conn, request}} = conn, _options) do
-    with {:sslsocket, _, _} = socket <- :cowboy_req.get(:socket, request),
-         {:ok, raw_certificate} <- :ssl.peercert(socket) do
-      do_call(conn, raw_certificate)
-    else
-      _ -> conn
+  if function_exported?(:cowboy_req, :get, 2) do
+    def call(%Conn{adapter: {Plug.Adapters.Cowboy.Conn, request}} = conn, _options) do
+      with {:sslsocket, _, _} = socket <- :cowboy_req.get(:socket, request),
+           {:ok, raw_certificate} <- :ssl.peercert(socket) do
+        do_call(conn, raw_certificate)
+      else
+        _ -> conn
+      end
     end
   end
 

@@ -1,3 +1,3 @@
 [
-  inputs: [".formatter.exs", "mix.exs", "{config,lib,test}/**/*.{ex,exs}"]
+  inputs: ["{.formatter,.dialyzer-ignore,mix}.exs", "{config,lib,test}/**/*.{ex,exs}"]
 ]
